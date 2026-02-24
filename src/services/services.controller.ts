@@ -1,4 +1,11 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -15,5 +22,9 @@ export class ServicesController {
   @Post()
   create(@Body() dto: CreateServiceDto, @Request() req) {
     return this.servicesService.create(dto, req.user.id);
+  }
+  @Get()
+  findAll() {
+    return this.servicesService.findAll();
   }
 }

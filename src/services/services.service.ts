@@ -14,4 +14,18 @@ export class ServicesService {
       },
     });
   }
+
+  async findAll() {
+    return this.prisma.service.findMany({
+      include: {
+        professional: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
 }
