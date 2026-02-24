@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 
@@ -70,7 +75,6 @@ export class AppointmentsService {
       });
     }
 
-    // CLIENT
     return this.prisma.appointment.findMany({
       where: {
         clientId: user.id,
@@ -80,6 +84,44 @@ export class AppointmentsService {
         professional: {
           select: { id: true, name: true, email: true },
         },
+      },
+    });
+  }
+
+  async cancel(id: number, user: any) {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found');
+    }
+
+    if (user.role === 'CLIENT' && appointment.clientId !== user.id) {
+      throw new ForbiddenException('You can only cancel your own appointments');
+    }
+
+    if (
+      user.role === 'PROFESSIONAL' &&
+      appointment.professionalId !== user.id
+    ) {
+      throw new ForbiddenException('You can only cancel your own appointments');
+    }
+
+    if (appointment.status === 'COMPLETED') {
+      throw new BadRequestException(
+        'Completed appointments cannot be cancelled',
+      );
+    }
+
+    if (appointment.status === 'CANCELLED') {
+      throw new BadRequestException('Appointment already cancelled');
+    }
+
+    return this.prisma.appointment.update({
+      where: { id },
+      data: {
+        status: 'CANCELLED',
       },
     });
   }

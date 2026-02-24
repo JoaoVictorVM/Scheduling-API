@@ -5,6 +5,8 @@ import {
   UseGuards,
   Request,
   Get,
+  Patch,
+  Param,
 } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -29,5 +31,12 @@ export class AppointmentsController {
   @Get()
   findAll(@Request() req) {
     return this.appointmentsService.findAll(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CLIENT, UserRole.PROFESSIONAL, UserRole.ADMIN)
+  @Patch(':id/cancel')
+  cancel(@Param('id') id: string, @Request() req) {
+    return this.appointmentsService.cancel(Number(id), req.user);
   }
 }
