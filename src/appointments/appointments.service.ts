@@ -41,4 +41,46 @@ export class AppointmentsService {
       },
     });
   }
+  async findAll(user: any) {
+    if (user.role === 'ADMIN') {
+      return this.prisma.appointment.findMany({
+        include: {
+          service: true,
+          client: {
+            select: { id: true, name: true, email: true },
+          },
+          professional: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+      });
+    }
+
+    if (user.role === 'PROFESSIONAL') {
+      return this.prisma.appointment.findMany({
+        where: {
+          professionalId: user.id,
+        },
+        include: {
+          service: true,
+          client: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+      });
+    }
+
+    // CLIENT
+    return this.prisma.appointment.findMany({
+      where: {
+        clientId: user.id,
+      },
+      include: {
+        service: true,
+        professional: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+  }
 }

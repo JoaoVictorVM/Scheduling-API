@@ -1,4 +1,11 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Get,
+} from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -15,5 +22,12 @@ export class AppointmentsController {
   @Post()
   create(@Body() dto: CreateAppointmentDto, @Request() req) {
     return this.appointmentsService.create(dto, req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CLIENT, UserRole.PROFESSIONAL, UserRole.ADMIN)
+  @Get()
+  findAll(@Request() req) {
+    return this.appointmentsService.findAll(req.user);
   }
 }
