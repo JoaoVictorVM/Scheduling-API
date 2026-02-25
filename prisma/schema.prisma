@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // ou mysql, veja o que você está usando
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -35,7 +35,7 @@ model User {
 model Service {
   id            Int      @id @default(autoincrement())
   name          String
-  duration      Int      // duração em minutos
+  duration      Int
   price         Float
   professional  User     @relation(fields: [professionalId], references: [id])
   professionalId Int
