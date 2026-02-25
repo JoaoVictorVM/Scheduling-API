@@ -125,4 +125,46 @@ export class AppointmentsService {
       },
     });
   }
+
+  async complete(id: number, user: any) {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found');
+    }
+
+    if (user.role === 'CLIENT') {
+      throw new ForbiddenException(
+        'Clients cannot mark appointments as completed',
+      );
+    }
+
+    if (
+      user.role === 'PROFESSIONAL' &&
+      appointment.professionalId !== user.id
+    ) {
+      throw new ForbiddenException(
+        'You can only complete your own appointments',
+      );
+    }
+
+    if (appointment.status === 'CANCELLED') {
+      throw new BadRequestException(
+        'Cancelled appointments cannot be completed',
+      );
+    }
+
+    if (appointment.status === 'COMPLETED') {
+      throw new BadRequestException('Appointment already completed');
+    }
+
+    return this.prisma.appointment.update({
+      where: { id },
+      data: {
+        status: 'COMPLETED',
+      },
+    });
+  }
 }
