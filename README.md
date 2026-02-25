@@ -148,7 +148,7 @@ Atualmente, a aplicação pode ser executada localmente seguindo as instruções
 - Endpoint para ADMIN listar usuários
 - Seed automático para ADMIN
 - Docker support
-  - Deploy em ambiente cloud (Railway)
+- Deploy em ambiente cloud (Railway)
 
 **v1.2**
 
